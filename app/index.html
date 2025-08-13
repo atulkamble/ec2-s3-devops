@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>AWS EC2 + S3 + CloudFront</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    body { font-family: system-ui, -apple-system, Arial, sans-serif; margin: 40px; }
+    .hero { text-align:center; }
+    img { max-width: 280px; height:auto; }
+    code { background:#f4f4f4; padding:2px 6px; border-radius:4px; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <h1>☁️ Static Assets via CloudFront + S3</h1>
+    <p>HTML hosted on EC2. Images/CSS/JS via CloudFront.</p>
+    <img src="https://CHANGEME_CLOUDFRONT_DOMAIN/assets/coffee.png" alt="Coffee"/>
+  </div>
+
+  <hr/>
+  <p>Try editing <code>app/index.html</code> and pushing to <code>main</code>. The workflow will upload
+     <code>/app/assets/*</code> to S3 and rsync this file to EC2.</p>
+</body>
+</html>

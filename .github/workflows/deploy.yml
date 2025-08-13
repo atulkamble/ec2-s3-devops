@@ -1,0 +1,40 @@
+name: Deploy Website
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'app/**'
+      - '.github/workflows/deploy.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}   # (optional) OIDC role; else set AWS creds as secrets
+
+      - name: Upload assets to S3
+        run: |
+          BUCKET="${{ secrets.S3_BUCKET }}"
+          aws s3 sync app/assets "s3://${BUCKET}/assets" --delete --cache-control "public,max-age=31536000,immutable"
+
+      # Option A: Upload HTML to EC2 via SSH
+      - name: Deploy HTML to EC2
+        if: ${{ success() }}
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
+          chmod 600 key.pem
+          rsync -avz -e "ssh -i key.pem -o StrictHostKeyChecking=no" app/index.html ec2-user@${EC2_HOST}:/var/www/html/index.html
+
+      # Option B (preferred): Store HTML in repo and let user-data pull from Git (not shown here)
